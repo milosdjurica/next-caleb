@@ -1,28 +1,34 @@
 import axios from "axios";
 import { InferGetStaticPropsType } from "next";
 
-type Customer = {
+export type Customer = {
     _id: string;
     name: string;
     industry: string;
 };
 
+type GetCustomersResponse = {
+    data: Customer[];
+};
+
 export async function getStaticProps(context: any) {
     let result: any;
     try {
-        result = await axios.get("http://127.0.0.1:5000/customers");
-        console.log(result.data);
+        result = await axios.get<GetCustomersResponse>(
+            "http://127.0.0.1:5000/customers"
+        );
+        return {
+            props: {
+                customers: result.data as Customer[],
+            },
+            // how often the page is reloaded (60sec)
+            revalidate: 30,
+        };
+    
     } catch (error) {
-        console.log(error);
+        return {props: { customers: []}}
     }
 
-    return {
-        props: {
-            customers: result.data as Customer[],
-        }, // will be passed to the page component as props
-        revalidate: 60,
-        
-    };
 }
 
 function Customers({
