@@ -1,32 +1,27 @@
+import axios from "axios";
 import { InferGetStaticPropsType } from "next";
 
 type Customer = {
-    id: number;
+    _id: string;
     name: string;
     industry: string;
 };
 
 export async function getStaticProps(context: any) {
+    let result: any;
+    try {
+        result = await axios.get("http://127.0.0.1:5000/customers");
+        console.log(result.data);
+    } catch (error) {
+        console.log(error);
+    }
+
     return {
         props: {
-            customers: [
-                {
-                    id: 1,
-                    name: "Proba ime",
-                    industry: "Proba industry",
-                },
-                {
-                    id: 2,
-                    name: "ime2",
-                    industry: "industry2",
-                },
-                {
-                    id: 3,
-                    name: "33333333",
-                    industry: "33333 industry",
-                },
-            ] as Customer[],
+            customers: result.data as Customer[],
         }, // will be passed to the page component as props
+        revalidate: 60,
+        
     };
 }
 
@@ -38,10 +33,11 @@ function Customers({
             <h1> ALL CUSTOMERS </h1>
             {customers.map((customer: Customer) => {
                 return (
-                    <div key={customer.id}>
-                        <p>{customer.id}</p>
+                    <div key={customer["_id"]}>
+                        <p>{customer["_id"]}</p>
                         <p>{customer.name}</p>
                         <p>{customer.industry}</p>
+                        <br></br>
                     </div>
                 );
             })}
