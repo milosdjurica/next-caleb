@@ -1,4 +1,4 @@
-import axios, { AxiosError } from "axios";
+import axios from "axios";
 import { GetStaticPaths, GetStaticProps, NextPage } from "next";
 import { useRouter } from "next/router";
 import { ParsedUrlQuery } from "querystring";
@@ -16,14 +16,19 @@ interface Params extends ParsedUrlQuery {
 export const getStaticPaths: GetStaticPaths = async () => {
     const result = await axios.get("http://127.0.0.1:5000/customers/");
 
-    const paths = result.data.map((customer: Customer) => {
-        return { params: { customerId: customer._id } };
-    });
+    // ! dont need this when doing lazy caching
+    // const paths = result.data.map((customer: Customer) => {
+    //     return { params: { customerId: customer._id } };
+    // });
+
     return {
-        // all _id-s from database
-        paths: paths,
-        // if true getStatic paths are executed just on build
-        fallback: true,
+        // LAZY CACHING
+        // 0 pages are cached before requested for the first time!
+        paths: [],
+        // !notes
+        // fallback: true,
+        // !blocking -> Better for SEO, worse user experience
+        fallback: "blocking",
     };
 };
 
@@ -41,17 +46,13 @@ export const getStaticProps: GetStaticProps<Props, Params> = async (
             props: {
                 customer: result.data,
             },
+            // check every 30 secs if customer is updated or something
+            revalidate: 30,
         };
     } catch (error) {
-        if (error instanceof AxiosError) {
-            if (error.response?.status === 404) {
-                return {
-                    notFound: true,
-                };
-            }
-        }
         return {
-            props: {},
+            notFound: true,
+            revalidate: 30,
         };
     }
 };
