@@ -1,12 +1,12 @@
-import axios from "axios";
+import clientPromise from "@/lib/mongodb";
+import { ObjectId } from "mongodb";
 import { GetStaticPaths, GetStaticProps, NextPage } from "next";
 import { useRouter } from "next/router";
 import { ParsedUrlQuery } from "querystring";
 import { Customer } from ".";
 
 type Props = {
-    // optional because of try catch in getStaticProps
-    customer?: Customer;
+    customer: Customer;
 };
 
 interface Params extends ParsedUrlQuery {
@@ -14,13 +14,6 @@ interface Params extends ParsedUrlQuery {
 }
 
 export const getStaticPaths: GetStaticPaths = async () => {
-    const result = await axios.get("http://127.0.0.1:5000/customers/");
-
-    // ! dont need this when doing lazy caching
-    // const paths = result.data.map((customer: Customer) => {
-    //     return { params: { customerId: customer._id } };
-    // });
-
     return {
         // LAZY CACHING
         // 0 pages are cached before requested for the first time!
@@ -39,20 +32,32 @@ export const getStaticProps: GetStaticProps<Props, Params> = async (
     const params = context.params!;
 
     try {
-        const result = await axios.get<Customer>(
-            `http://127.0.0.1:5000/customers/${params.customerId}`
-        );
+        const mongoClient = await clientPromise;
+
+        const data = (await mongoClient
+            .db()
+            .collection("customers")
+            .findOne({ _id: new ObjectId(params.customerId) })) as Customer;
+
+        // !this hits when ObjectId is right format but not found
+        // !maybe data is just inserted -> revalidate to check
+        if (!data) {
+            return {
+                notFound: true,
+                revalidate: 30,
+            };
+        }
+
         return {
             props: {
-                customer: result.data,
+                customer: JSON.parse(JSON.stringify(data)),
             },
-            // check every 30 secs if customer is updated or something
+            // check every 30 secs if customer is updated/deleted
             revalidate: 30,
         };
     } catch (error) {
         return {
             notFound: true,
-            revalidate: 30,
         };
     }
 };
@@ -65,7 +70,7 @@ const Customer: NextPage<Props> = (props) => {
 
     return (
         <>
-            <h1>Customer with id : {props.customer!._id}</h1>
+            <h1>Customer with id : {props.customer!._id.toString()}</h1>
             <h1>Customer with name : {props.customer!.name}</h1>;
         </>
     );

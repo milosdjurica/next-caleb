@@ -1,34 +1,34 @@
-import axios from "axios";
+import clientPromise from "@/lib/mongodb";
+import { ObjectId } from "mongodb";
 import { InferGetStaticPropsType } from "next";
 
 export type Customer = {
-    _id: string;
+    _id: ObjectId;
     name: string;
     industry: string;
 };
 
-type GetCustomersResponse = {
-    data: Customer[];
-};
-
 export async function getStaticProps(context: any) {
-    let result: any;
     try {
-        result = await axios.get<GetCustomersResponse>(
-            "http://127.0.0.1:5000/customers"
-        );
+        const mongoClient = await clientPromise;
+
+        const data = await mongoClient
+            .db()
+            .collection("customers")
+            .find({})
+            .toArray();
+
         return {
             props: {
-                customers: result.data as Customer[],
+                customers: JSON.parse(JSON.stringify(data)),
             },
-            // how often the page is reloaded (60sec)
+            // how often the page is reloaded (30sec)
             revalidate: 30,
         };
-    
     } catch (error) {
-        return {props: { customers: []}}
+        // empty customers array if there was some error
+        return { props: { customers: [] } };
     }
-
 }
 
 function Customers({
@@ -39,8 +39,8 @@ function Customers({
             <h1> ALL CUSTOMERS </h1>
             {customers.map((customer: Customer) => {
                 return (
-                    <div key={customer["_id"]}>
-                        <p>{customer["_id"]}</p>
+                    <div key={customer["_id"].toString()}>
+                        <p>{customer["_id"].toString()}</p>
                         <p>{customer.name}</p>
                         <p>{customer.industry}</p>
                         <br></br>
