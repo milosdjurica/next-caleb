@@ -1,6 +1,6 @@
-import clientPromise from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
 import { InferGetStaticPropsType } from "next";
+import { getAllCustomers } from "../api/customers";
 
 export type Customer = {
     _id: ObjectId;
@@ -10,17 +10,11 @@ export type Customer = {
 
 export async function getStaticProps(context: any) {
     try {
-        const mongoClient = await clientPromise;
-
-        const data = await mongoClient
-            .db()
-            .collection("customers")
-            .find({})
-            .toArray();
+        const customers = await getAllCustomers();
 
         return {
             props: {
-                customers: JSON.parse(JSON.stringify(data)),
+                customers: customers,
             },
             // how often the page is reloaded (30sec)
             revalidate: 30,
@@ -36,11 +30,15 @@ function Customers({
 }: InferGetStaticPropsType<typeof getStaticProps>) {
     return (
         <>
-            <h1> ALL CUSTOMERS </h1>
+            {customers.length > 0 ? (
+                <h1> ALL CUSTOMERS </h1>
+            ) : (
+                <h1>No customers right now, your business is not glowing!</h1>
+            )}
             {customers.map((customer: Customer) => {
                 return (
-                    <div key={customer["_id"].toString()}>
-                        <p>{customer["_id"].toString()}</p>
+                    <div key={customer._id.toString()}>
+                        <p>{customer._id.toString()}</p>
                         <p>{customer.name}</p>
                         <p>{customer.industry}</p>
                         <br></br>
