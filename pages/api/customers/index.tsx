@@ -2,6 +2,7 @@ import clientPromise from "@/lib/mongodb";
 import { Customer } from "@/pages/customers";
 import { ObjectId } from "mongodb";
 import { NextApiRequest, NextApiResponse } from "next";
+import NextCors from "nextjs-cors";
 
 type CreateCustomerType = {
     name: string;
@@ -40,8 +41,16 @@ export const createCustomer = async (
     }
 };
 
-export default async function handler(req: any, res: any) {
+export default async function handler(
+    req: NextApiRequest,
+    res: NextApiResponse
+) {
     try {
+        await NextCors(req, res, {
+            methods: ["GET", "POST"],
+            origin: process.env.VITE_URL,
+            optionsSuccessStatus: 200,
+        });
         if (req.method === "GET") {
             const customers = await getAllCustomers();
             res.status(200).json(customers);
@@ -61,6 +70,6 @@ export default async function handler(req: any, res: any) {
             res.status(201).json(createdId);
         }
     } catch (error) {
-        console.log("BACK ERR");
+        return res.status(404).json("Backend error!");
     }
 }

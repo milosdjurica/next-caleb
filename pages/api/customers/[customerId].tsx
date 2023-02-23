@@ -37,7 +37,7 @@ export const deleteCustomer = async (customerId: ObjectId) => {
         .deleteOne({ _id: customerId });
 };
 
-export default async (
+export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse<
         | Customer
@@ -45,7 +45,7 @@ export default async (
         | { deletedCount: number }
         | { error: string }
     >
-) => {
+) {
     try {
         const customerId = new ObjectId(req.query.customerId! as string);
         if (req.method === "GET") {
@@ -58,7 +58,6 @@ export default async (
                 name: req.body.name,
                 industry: req.body.industry,
             });
-            console.log("izasao");
             res.status(200).json({
                 modifiedCount: updateResponse.modifiedCount,
             });
@@ -71,4 +70,4 @@ export default async (
             error: "Server error, customer not found! Check if ID is valid",
         });
     }
-};
+}

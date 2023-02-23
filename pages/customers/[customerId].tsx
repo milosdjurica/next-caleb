@@ -1,3 +1,4 @@
+import { ObjectId } from "mongodb";
 import { GetStaticPaths, GetStaticProps, NextPage } from "next";
 import { useRouter } from "next/router";
 import { ParsedUrlQuery } from "querystring";
@@ -31,8 +32,7 @@ export const getStaticProps: GetStaticProps<Props, Params> = async (
     const params = context.params!;
 
     try {
-
-        const customer = await getCustomer(params.customerId)
+        const customer = await getCustomer(new ObjectId(params.customerId));
 
         // !this hits when ObjectId is right format but not found
         // !maybe customer is just inserted -> revalidate to check

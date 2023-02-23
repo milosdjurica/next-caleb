@@ -1,3 +1,5 @@
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
 import { ObjectId } from "mongodb";
 import { InferGetStaticPropsType } from "next";
 import { getAllCustomers } from "../api/customers";
@@ -28,14 +30,25 @@ export async function getStaticProps(context: any) {
 function Customers({
     customers,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
+    const query = useQuery(
+        ["customers"],
+        async () => {
+            const response = await axios.get("api/customers");
+            return response.data as Customer[];
+        },
+        {
+            initialData: customers,
+        }
+    );
+
     return (
         <>
-            {customers.length > 0 ? (
+            {query.data.length > 0 ? (
                 <h1> ALL CUSTOMERS </h1>
             ) : (
                 <h1>No customers right now, your business is not glowing!</h1>
             )}
-            {customers.map((customer: Customer) => {
+            {query.data.map((customer: Customer) => {
                 return (
                     <div key={customer._id.toString()}>
                         <p>{customer._id.toString()}</p>
