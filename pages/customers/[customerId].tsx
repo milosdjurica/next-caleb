@@ -65,8 +65,8 @@ const Customer: NextPage<Props> = (props) => {
 
     return (
         <>
-            <h1>Customer with id : {props.customer!._id.toString()}</h1>
-            <h1>Customer with name : {props.customer!.name}</h1>;
+            <h1>Name : {props.customer!.name}</h1>
+            <h1>Industry : {props.customer!.industry}</h1>
         </>
     );
 };

@@ -1,4 +1,6 @@
 import CustomerComponent from "@/components/Customer";
+import Container from "@mui/material/Container";
+import Grid from "@mui/material/Grid";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { ObjectId } from "mongodb";
@@ -43,21 +45,19 @@ function Customers({
     );
 
     return (
-        <>
-            {query.data.length > 0 ? (
-                <h1> ALL CUSTOMERS </h1>
-            ) : (
-                <h1>No customers right now, your business is not glowing!</h1>
-            )}
-            {query.data.map((customer: Customer) => {
-                return (
-                    <CustomerComponent
-                        customer={customer}
-                        key={customer._id.toString()}
-                    />
-                );
-            })}
-        </>
+        // !Container and grid to make a nice look
+        <Container>
+            <Grid container spacing={5} sx={{ mt: 1 }}>
+                {query.data.map((customer: Customer) => {
+                    return (
+                        <CustomerComponent
+                            customer={customer}
+                            key={customer._id.toString()}
+                        />
+                    );
+                })}
+            </Grid>
+        </Container>
     );
 }
 

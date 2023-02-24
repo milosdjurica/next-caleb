@@ -2,11 +2,17 @@ import Tooltip from "@mui/material/Tooltip";
 import PersonIcon from "@mui/icons-material/Person2";
 import Button from "@mui/material/Button";
 import { Customer } from "@/pages/customers";
+import Grid from "@mui/material/Grid";
 
 // !props.customer destructured
+// type props = {
+//     customer: Customer;
+// };
+
 function CustomerComponent({ customer }: { customer: Customer }) {
     return (
-        <div style={{ marginBottom: 50 }}>
+        // !Grid item because it gets called under grid container
+        <Grid item>
             <span
                 style={{
                     display: "flex",
@@ -22,7 +28,7 @@ function CustomerComponent({ customer }: { customer: Customer }) {
             <p>{customer.industry}</p>
             <Button variant="contained">View Orders</Button>
             <br></br>
-        </div>
+        </Grid>
     );
 }
 export default CustomerComponent;

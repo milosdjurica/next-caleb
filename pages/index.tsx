@@ -8,6 +8,8 @@ import Orders from "@/components/Orders";
 import Link from "@mui/material/Link";
 import Typography from "@mui/material/Typography";
 
+// !HOME PAGE
+
 function Copyright(props: any) {
     return (
         <Typography
