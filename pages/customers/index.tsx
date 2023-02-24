@@ -1,3 +1,4 @@
+import CustomerComponent from "@/components/Customer";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { ObjectId } from "mongodb";
@@ -50,12 +51,10 @@ function Customers({
             )}
             {query.data.map((customer: Customer) => {
                 return (
-                    <div key={customer._id.toString()}>
-                        <p>{customer._id.toString()}</p>
-                        <p>{customer.name}</p>
-                        <p>{customer.industry}</p>
-                        <br></br>
-                    </div>
+                    <CustomerComponent
+                        customer={customer}
+                        key={customer._id.toString()}
+                    />
                 );
             })}
         </>
