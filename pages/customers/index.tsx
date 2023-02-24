@@ -3,15 +3,9 @@ import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { ObjectId } from "mongodb";
 import { InferGetStaticPropsType } from "next";
+import { CustomerType } from "@/types";
 import { getAllCustomers } from "../api/customers";
-
-export type Customer = {
-    _id: ObjectId;
-    name: string;
-    industry: string;
-};
 
 export async function getStaticProps(context: any) {
     try {
@@ -37,7 +31,7 @@ function Customers({
         ["customers"],
         async () => {
             const response = await axios.get("api/customers");
-            return response.data as Customer[];
+            return response.data as CustomerType[];
         },
         {
             initialData: customers,
@@ -48,7 +42,7 @@ function Customers({
         // !Container and grid to make a nice look
         <Container>
             <Grid container spacing={5} sx={{ mt: 1 }}>
-                {query.data.map((customer: Customer) => {
+                {query.data.map((customer: CustomerType) => {
                     return (
                         <CustomerComponent
                             customer={customer}

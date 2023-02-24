@@ -1,12 +1,12 @@
+import { CustomerType } from "@/types";
 import { ObjectId } from "mongodb";
 import { GetStaticPaths, GetStaticProps, NextPage } from "next";
 import { useRouter } from "next/router";
 import { ParsedUrlQuery } from "querystring";
-import { Customer } from ".";
 import { getCustomer } from "../api/customers/[customerId]";
 
 type Props = {
-    customer: Customer;
+    customer: CustomerType;
 };
 
 interface Params extends ParsedUrlQuery {

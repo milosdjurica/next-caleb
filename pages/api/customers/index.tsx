@@ -1,5 +1,5 @@
 import clientPromise from "@/lib/mongodb";
-import { Customer } from "@/pages/customers";
+import { CustomerType, OrderType } from "@/types";
 import { ObjectId } from "mongodb";
 import { NextApiRequest, NextApiResponse } from "next";
 import NextCors from "nextjs-cors";
@@ -7,9 +7,10 @@ import NextCors from "nextjs-cors";
 type CreateCustomerType = {
     name: string;
     industry: string;
+    orders?: OrderType[]
 };
 
-export const getAllCustomers = async (): Promise<Customer[]> => {
+export const getAllCustomers = async (): Promise<CustomerType[]> => {
     try {
         const mongoClient = await clientPromise;
 
@@ -18,7 +19,7 @@ export const getAllCustomers = async (): Promise<Customer[]> => {
             .collection("customers")
             .find()
             .toArray();
-        return JSON.parse(JSON.stringify(customers)) as Customer[];
+        return JSON.parse(JSON.stringify(customers)) as CustomerType[];
     } catch (error) {
         return [];
     }

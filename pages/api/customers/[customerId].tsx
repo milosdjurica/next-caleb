@@ -1,5 +1,5 @@
 import clientPromise from "@/lib/mongodb";
-import { Customer } from "@/pages/customers";
+import { CustomerType } from "@/types";
 import { ObjectId } from "mongodb";
 import { NextApiRequest, NextApiResponse } from "next";
 
@@ -8,12 +8,14 @@ type UpdateCustomerType = {
     industry?: string;
 };
 
-export const getCustomer = async (customerId: ObjectId): Promise<Customer> => {
+export const getCustomer = async (
+    customerId: ObjectId
+): Promise<CustomerType> => {
     const mongoClient = await clientPromise;
     const customer = (await mongoClient
         .db()
         .collection("customers")
-        .findOne({ _id: customerId })) as Customer;
+        .findOne({ _id: customerId })) as CustomerType;
 
     return JSON.parse(JSON.stringify(customer));
 };
@@ -40,7 +42,7 @@ export const deleteCustomer = async (customerId: ObjectId) => {
 export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse<
-        | Customer
+        | CustomerType
         | { modifiedCount: number }
         | { deletedCount: number }
         | { error: string }
