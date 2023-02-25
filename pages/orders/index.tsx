@@ -4,10 +4,20 @@ import { DataGrid, GridColDef, GridValueGetterParams } from "@mui/x-data-grid";
 import Container from "@mui/material/Container";
 import { getAllCustomers } from "../api/customers";
 import { CustomerType } from "@/types";
+import { useRouter } from "next/router";
 
 const columns: GridColDef[] = [
     // !Just comment line below if don't want ID to be displayed
-    { field: "id", headerName: "ID", width: 90 },
+    {
+        field: "id",
+        headerName: "Order ID",
+        width: 150,
+    },
+    {
+        field: "customerId",
+        headerName: "Customer ID",
+        width: 150,
+    },
     {
         field: "customerName",
         headerName: "Customer",
@@ -30,24 +40,18 @@ const columns: GridColDef[] = [
     },
 ];
 
-const rows = [
-    { id: 1, lastName: "Snow", firstName: "Jon", age: 35 },
-    { id: 2, lastName: "Lannister", firstName: "Cersei", age: 42 },
-    { id: 3, lastName: "Lannister", firstName: "Jaime", age: 45 },
-    { id: 4, lastName: "Stark", firstName: "Arya", age: 16 },
-    { id: 5, lastName: "Targaryen", firstName: "Daenerys", age: null },
-    { id: 6, lastName: "Melisandre", firstName: null, age: 150 },
-    { id: 7, lastName: "Clifford", firstName: "Ferrara", age: 44 },
-    { id: 8, lastName: "Frances", firstName: "Rossini", age: 36 },
-    { id: 9, lastName: "Roxie", firstName: "Harvey", age: 65 },
-];
-
 export async function getStaticProps() {
     const data = await getAllCustomers();
 
     let orders = data
         .map((customer: CustomerType) => {
-            return { ...customer.orders, customerName: customer.name } || null;
+            return (
+                {
+                    ...customer.orders,
+                    customerName: customer.name,
+                    customerId: customer._id,
+                } || null
+            );
         })
         .flat(1)
         .filter((el) => el._id)
@@ -58,7 +62,6 @@ export async function getStaticProps() {
             };
         });
 
-    console.log(orders);
     return {
         props: {
             orders: orders,
@@ -68,11 +71,20 @@ export async function getStaticProps() {
 }
 
 export default function Orders(props: any) {
-    // console.log(props);
+    const { customerId } = useRouter().query;
     return (
         <Container>
             <Box sx={{ height: 400, width: "100%" }}>
                 <DataGrid
+                    filterModel={{
+                        items: [
+                            {
+                                columnField: "customerId",
+                                operatorValue: "equals",
+                                value: customerId,
+                            },
+                        ],
+                    }}
                     rows={props.orders}
                     columns={columns}
                     pageSize={5}
@@ -80,6 +92,19 @@ export default function Orders(props: any) {
                     checkboxSelection
                     disableSelectionOnClick
                     experimentalFeatures={{ newEditingApi: true }}
+                    initialState={{
+                        filter: {
+                            filterModel: {
+                                items: [
+                                    {
+                                        columnField: "customerId",
+                                        operatorValue: "equals",
+                                        value: customerId,
+                                    },
+                                ],
+                            },
+                        },
+                    }}
                 />
             </Box>
         </Container>

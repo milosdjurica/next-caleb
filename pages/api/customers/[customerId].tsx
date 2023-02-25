@@ -1,11 +1,12 @@
 import clientPromise from "@/lib/mongodb";
-import { CustomerType } from "@/types";
+import { CustomerType, OrderType } from "@/types";
 import { ObjectId } from "mongodb";
 import { NextApiRequest, NextApiResponse } from "next";
 
 type UpdateCustomerType = {
     name?: string;
     industry?: string;
+    orders?: OrderType[];
 };
 
 export const getCustomer = async (
@@ -59,6 +60,7 @@ export default async function handler(
             const updateResponse = await editCustomer(customerId, {
                 name: req.body.name,
                 industry: req.body.industry,
+                orders: req.body.orders,
             });
             res.status(200).json({
                 modifiedCount: updateResponse.modifiedCount,

@@ -151,12 +151,18 @@ export default function Theme(props: any) {
                             </ListItemIcon>
                             <ListItemText primary="Dashboard" />
                         </ListItemButton>
-                        {/* <ListItemButton>
+                        <ListItemButton
+                            selected={
+                                router.pathname === "/orders" ? true : false
+                            }
+                            component={Link}
+                            href="/orders"
+                        >
                             <ListItemIcon>
                                 <ShoppingCartIcon />
                             </ListItemIcon>
                             <ListItemText primary="Orders" />
-                        </ListItemButton> */}
+                        </ListItemButton>
                         <ListItemButton
                             selected={
                                 router.pathname === "/customers" ? true : false

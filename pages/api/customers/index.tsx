@@ -7,7 +7,7 @@ import NextCors from "nextjs-cors";
 type CreateCustomerType = {
     name: string;
     industry: string;
-    orders?: OrderType[]
+    orders?: OrderType[];
 };
 
 export const getAllCustomers = async (): Promise<CustomerType[]> => {
@@ -63,6 +63,9 @@ export default async function handler(
             const customer: CreateCustomerType = {
                 name: req.body.name,
                 industry: req.body.industry,
+                orders: req.body.orders.map((order: OrderType) => {
+                    return { ...order, _id: new ObjectId() };
+                }),
             };
 
             const createdId = await createCustomer(customer);
